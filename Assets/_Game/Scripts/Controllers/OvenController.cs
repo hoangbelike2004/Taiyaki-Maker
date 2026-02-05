@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 public enum CakeProcessStage
@@ -33,8 +34,11 @@ public class OvenController : MonoBehaviour
     private CakeProcessStage currentState;
 
     private int currentSteps = 0;
+
+    private CanvasBaking canvasBaking;
     void Awake()
     {
+        canvasBaking = GetComponent<CanvasBaking>();
         cakeMoldSO = Resources.Load<CakeMoldSO>(GameConstants.KEY_DATA_GAME_CAKE_MOLD);
         //goi ham instance ra các khuôn
     }
@@ -124,6 +128,7 @@ public class OvenController : MonoBehaviour
         this.cakeMoldBase = cakeMoldBase;
         cakeMoldPrefab = SimplePool.Spawn<CakeMoldPrefab>(cakeMoldBase.prefabType, Vector3.zero, Quaternion.identity);
         cakeMoldPrefab.SetParent(rectMold);
+        canvasBaking.DeactiveOverlayBtnNext();
     }
 
     void InstanceIngredientPhase()
