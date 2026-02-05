@@ -3,11 +3,12 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Image))]
-public class UIBatterPourEffect_LevelFill : MonoBehaviour
+public class UIRadialReveal : MonoBehaviour
 {
+    // ... (Các biến Header cũ giữ nguyên không đổi) ...
     [Header("Cài đặt Tốc độ")]
     [Tooltip("Tốc độ dâng lên của bột (0 -> 1)")]
-    [SerializeField] private float fillSpeed = 0.5f;
+    [SerializeField] private float fillSpeed = 0.2f;
 
     [Tooltip("Độ mềm của mép bột (Càng cao càng mượt)")]
     [SerializeField] private float edgeSoftness = 0.1f;
@@ -37,156 +38,161 @@ public class UIBatterPourEffect_LevelFill : MonoBehaviour
     private Color32[] batterPixels;
     private Color32[] moldPixels;
 
-    // Mảng lưu "Thời điểm được lấp đầy" của từng pixel
-    // Giá trị từ 0.0 (lấp ngay lập tức) đến 1.0 (lấp sau cùng)
+    private int texWidth, texHeight;
+    private int moldWidth, moldHeight;
     private float[] fillThresholdMap;
 
-    private int texWidth, texHeight;
-    private int centerX, centerY;
-    private bool isPouring = false;
-    private float maxDist; // Đường chéo dài nhất
+    private float maxDist;
+    private Coroutine coroutinePouring;
+
+    // --- CÁC BIẾN MỚI THÊM VÀO ĐỂ CHECK WIN ---
+    private float currentLevel = 0f; // Đưa ra ngoài để lưu tiến độ đổ
+    private bool isFinished = false; // Biến kiểm tra xem đã thắng chưa
 
     void Start()
     {
         SetupTexture();
     }
 
-    void Update()
+    public void StarPouring()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && !isPouring)
-        {
-            isPouring = true;
-            StartCoroutine(PouringProcess());
-        }
+        // Nếu đã thắng rồi thì không cho đổ nữa
+        if (isFinished) return;
+
+        // Nếu đang chạy thì dừng lại trước khi chạy cái mới (tránh bị chồng lấn)
+        if (coroutinePouring != null) StopCoroutine(coroutinePouring);
+
+        coroutinePouring = StartCoroutine(PouringProcess());
+    }
+
+    public void EndPouring()
+    {
+        if (coroutinePouring != null) StopCoroutine(coroutinePouring);
     }
 
     void SetupTexture()
     {
+        // ... (Giữ nguyên toàn bộ logic trong hàm SetupTexture của bạn) ...
         if (targetImage == null) targetImage = GetComponent<Image>();
-        if (targetImage.sprite == null || moldSprite == null)
-        {
-            Debug.LogError("Thiếu ảnh Target hoặc Mold!");
-            return;
-        }
+        if (targetImage.sprite == null || moldSprite == null) return;
 
         Sprite batterSprite = targetImage.sprite;
-        if (!batterSprite.texture.isReadable || !moldSprite.texture.isReadable)
-        {
-            Debug.LogError("Chưa bật Read/Write Enabled!");
-            return;
-        }
+        if (!batterSprite.texture.isReadable || !moldSprite.texture.isReadable) return;
 
-        Rect rect = batterSprite.rect;
-        texWidth = (int)rect.width;
-        texHeight = (int)rect.height;
-        centerX = texWidth / 2;
-        centerY = texHeight / 2;
-
-        // Tính đường chéo dài nhất từ tâm ra góc
-        maxDist = Mathf.Sqrt(centerX * centerX + centerY * centerY);
-
-        paintTex = new Texture2D(texWidth, texHeight, TextureFormat.ARGB32, false);
+        Rect batterRect = batterSprite.rect;
+        texWidth = (int)batterRect.width;
+        texHeight = (int)batterRect.height;
         batterPixels = GetPixelsFromSprite(batterSprite);
-        moldPixels = GetPixelsFromSprite(moldSprite); // Giả định cùng size
+
+        Rect moldRect = moldSprite.rect;
+        moldWidth = (int)moldRect.width;
+        moldHeight = (int)moldRect.height;
+        moldPixels = GetPixelsFromSprite(moldSprite);
 
         currentPixels = new Color32[batterPixels.Length];
         fillThresholdMap = new float[batterPixels.Length];
 
+        int centerX = texWidth / 2;
+        int centerY = texHeight / 2;
+        maxDist = Mathf.Sqrt(centerX * centerX + centerY * centerY);
+
         float rndX = Random.Range(0f, 100f);
         float rndY = Random.Range(0f, 100f);
 
-        // --- TÍNH TOÁN BẢN ĐỒ LẤP ĐẦY (PRE-CALCULATION) ---
+        paintTex = new Texture2D(texWidth, texHeight, TextureFormat.ARGB32, false);
+
         for (int y = 0; y < texHeight; y++)
         {
             for (int x = 0; x < texWidth; x++)
             {
                 int i = y * texWidth + x;
-
-                // 1. Ẩn pixel ban đầu
                 currentPixels[i] = batterPixels[i];
                 currentPixels[i].a = 0;
 
-                // 2. Tính toán các yếu tố
-                // A. Khoảng cách chuẩn hóa (0 ở tâm -> 1 ở rìa)
+                float u = x / (float)texWidth;
+                float v = y / (float)texHeight;
+                int mX = Mathf.FloorToInt(u * moldWidth);
+                int mY = Mathf.FloorToInt(v * moldHeight);
+                mX = Mathf.Clamp(mX, 0, moldWidth - 1);
+                mY = Mathf.Clamp(mY, 0, moldHeight - 1);
+                int moldIndex = mY * moldWidth + mX;
+
+                Color32 p = moldPixels[moldIndex];
+                float brightness = (0.299f * p.r + 0.587f * p.g + 0.114f * p.b) / 255f;
+                float heightNorm = 1.0f - brightness;
                 float dx = x - centerX;
                 float dy = y - centerY;
                 float distNorm = Mathf.Sqrt(dx * dx + dy * dy) / maxDist;
-
-                // B. Độ cao từ khuôn (Lấy độ sáng)
-                // Pixel sáng (1.0) -> Là hố sâu -> Cần lấp SỚM (Height = 0)
-                // Pixel tối (0.0) -> Là chỗ cao -> Cần lấp MUỘN (Height = 1)
-                Color32 p = (i < moldPixels.Length) ? moldPixels[i] : new Color32(0, 0, 0, 0);
-                float brightness = (0.299f * p.r + 0.587f * p.g + 0.114f * p.b) / 255f;
-                float heightNorm = 1.0f - brightness;
-
-                // C. Noise (để mép không bị đều tăm tắp)
                 float noise = Mathf.PerlinNoise((x * noiseScale) + rndX, (y * noiseScale) + rndY);
                 float noiseNorm = (noise - 0.5f) * noiseAmount;
 
-                // 3. TỔNG HỢP: QUYẾT ĐỊNH THỜI ĐIỂM FILL
-                // Công thức: (Độ cao * Trọng số) + (Khoảng cách * Trọng số)
-                // Nếu MoldWeight cao -> Height quyết định tất cả.
                 float threshold = (heightNorm * moldWeight) + (distNorm * distanceWeight) + noiseNorm;
-
-                // Clamp giá trị
                 if (threshold < 0) threshold = 0;
-
                 fillThresholdMap[i] = threshold;
             }
         }
-
         paintTex.SetPixels32(currentPixels);
         paintTex.Apply();
 
-        targetImage.sprite = Sprite.Create(paintTex, new Rect(0, 0, texWidth, texHeight), new Vector2(0.5f, 0.5f), batterSprite.pixelsPerUnit);
+        Vector2 pivot = new Vector2(batterSprite.pivot.x / batterSprite.rect.width, batterSprite.pivot.y / batterSprite.rect.height);
+        targetImage.sprite = Sprite.Create(paintTex, new Rect(0, 0, texWidth, texHeight), pivot, batterSprite.pixelsPerUnit);
     }
 
     IEnumerator PouringProcess()
     {
-        // currentLevel đi từ 0 (đáy thấp nhất) lên đến > 1 (ngập toàn bộ)
-        float currentLevel = 0f;
+        // Bỏ dòng "float currentLevel = 0f;" ở đây đi nhé, dùng biến toàn cục
 
-        // Vòng lặp dừng khi mức nước vượt quá tổng trọng số tối đa có thể (khoảng 1.2 cho an toàn)
-        while (currentLevel < 1.2f)
+        // Vòng lặp
+        while (currentLevel < 1.3f)
         {
             currentLevel += fillSpeed * Time.deltaTime;
 
-            ApplyWaterLevel(currentLevel);
+            // --- KIỂM TRA CHIẾN THẮNG Ở ĐÂY ---
+            // 1.2f là ngưỡng an toàn để đảm bảo hình đã đầy hẳn
+            if (currentLevel >= 1.2f && !isFinished)
+            {
+                isFinished = true;
+                OnLevelComplete(); // Gọi hàm xử lý thắng
+            }
+            // -----------------------------------
 
+            ApplyWaterLevel(currentLevel);
             paintTex.SetPixels32(currentPixels);
             paintTex.Apply();
             yield return null;
         }
 
-        // Finish
+        // Đoạn code dưới này chỉ chạy khi currentLevel >= 1.3f (quá đầy)
+        // Nếu đã win rồi thì thôi, còn chưa win thì force win nốt
+        if (!isFinished)
+        {
+            isFinished = true;
+            OnLevelComplete();
+        }
+
         System.Array.Copy(batterPixels, currentPixels, batterPixels.Length);
         paintTex.SetPixels32(currentPixels);
         paintTex.Apply();
-        isPouring = false;
+    }
+
+    // Hàm xử lý khi chiến thắng
+    void OnLevelComplete()
+    {
+        Observer.OnChangeStage?.Invoke();
     }
 
     void ApplyWaterLevel(float level)
     {
+        // ... (Giữ nguyên logic cũ) ...
         for (int i = 0; i < batterPixels.Length; i++)
         {
-            // Bỏ qua pixel trong suốt
             if (batterPixels[i].a == 0) continue;
-
-            // Lấy ngưỡng cần thiết để lấp pixel này
             float threshold = fillThresholdMap[i];
-
-            // Nếu mực nước (level) đã dâng qua ngưỡng (threshold) của pixel
             if (level > threshold)
             {
-                // Tính độ sâu ngập (Delta)
                 float delta = level - threshold;
-
-                // Tính Alpha dựa trên độ sâu (tạo độ dày/mờ biên)
                 float alphaPercent = delta / edgeSoftness;
-
                 if (alphaPercent > 1f) alphaPercent = 1f;
-
-                // Cập nhật Alpha
                 byte targetAlpha = (byte)(batterPixels[i].a * alphaPercent);
                 if (targetAlpha > currentPixels[i].a)
                 {
@@ -197,29 +203,26 @@ public class UIBatterPourEffect_LevelFill : MonoBehaviour
         }
     }
 
-    // Hàm cắt pixel (Copy từ đoạn code trước của bạn)
     Color32[] GetPixelsFromSprite(Sprite sprite)
     {
+        // ... (Giữ nguyên logic cũ) ...
         var rect = sprite.rect;
         int width = (int)rect.width;
         int height = (int)rect.height;
-
-        if (width == sprite.texture.width && height == sprite.texture.height)
-            return sprite.texture.GetPixels32();
-
-        Color32[] fullPixels = sprite.texture.GetPixels32();
+        Texture2D tex = sprite.texture;
+        if (width == tex.width && height == tex.height) return tex.GetPixels32();
+        Color32[] fullPixels = tex.GetPixels32();
         Color32[] croppedPixels = new Color32[width * height];
-        int startX = (int)rect.x;
-        int startY = (int)rect.y;
-        int atlasWidth = sprite.texture.width;
-
+        int startX = Mathf.FloorToInt(rect.x);
+        int startY = Mathf.FloorToInt(rect.y);
+        int atlasWidth = tex.width;
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
             {
                 int atlasIndex = (startY + y) * atlasWidth + (startX + x);
-                int localIndex = y * width + x;
-                if (atlasIndex < fullPixels.Length) croppedPixels[localIndex] = fullPixels[atlasIndex];
+                if (atlasIndex >= 0 && atlasIndex < fullPixels.Length)
+                    croppedPixels[y * width + x] = fullPixels[atlasIndex];
             }
         }
         return croppedPixels;

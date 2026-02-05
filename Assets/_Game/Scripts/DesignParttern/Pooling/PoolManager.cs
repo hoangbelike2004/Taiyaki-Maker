@@ -58,4 +58,11 @@ public enum PoolType
 {
     None,
     Audio_Sources,
+    Item_Cake_Mold,
+    Item_Cake_Mold_Ads,
+
+    Cake_Mold_Prefab_Moon,
+    Cake_Mold_Prefab_Fish,
+    Cake_Mold_Prefab_Round,
+    Cake_Mold_Prefab_Slipper,
 }

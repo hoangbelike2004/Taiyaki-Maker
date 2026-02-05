@@ -3,6 +3,10 @@ using UnityEngine;
 public enum CakeMoldType
 {
     None,
+    Fish_Cake,
+    Moon_Cake,
+    Round_Cake,
+    Slipper_Cake,
 }
 public enum IngredientPhaseType//Nguyen lieu lam nhan banh
 {
@@ -18,5 +22,16 @@ public class CakeMoldBase
 
     public Sprite icon;
 
-    public List<IngredientPhaseType> ingredientType;//Các loại nhân bánh có thể bỏ vào khuôn
+    public PoolType prefabType;
+
+    public List<CakeProcessStage> steps = new List<CakeProcessStage>
+    {
+    CakeProcessStage.AddingFilling,
+    CakeProcessStage.PouringTopLayer,
+    CakeProcessStage.Baking,
+    CakeProcessStage.Decorating,
+    CakeProcessStage.Completed
+    };//quy trinh lam ban
+
+    public List<IngredientPhaseType> ingredientTypes;//Các loại nhân bánh có thể bỏ vào khuôn
 }
