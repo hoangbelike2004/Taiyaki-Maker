@@ -4,7 +4,7 @@ using UnityEngine.UI;
 public class CanvasBaking : UIManager
 {
     [SerializeField] Button btnNextChoose;
-    [SerializeField] RectTransform rectChooseMold;
+    [SerializeField] RectTransform rectChooseMold, rectIngredient, recAdditionTiming;
 
     private Transform tfOverlaybtnNext;
     private bool isNext = false;
@@ -18,6 +18,7 @@ public class CanvasBaking : UIManager
         {
             if (!isNext) return;
             Observer.OnChangeStage?.Invoke();
+            Observer.OnEndStateChooseMold?.Invoke();
             DeactiveChooseMold();
         });
     }
@@ -33,13 +34,23 @@ public class CanvasBaking : UIManager
     {
         rectChooseMold.gameObject.SetActive(false);
     }
-    void OnEnable()
+
+    public void ActiveChooseMold()
     {
         tfOverlaybtnNext.gameObject.SetActive(true);
         isNext = false;
+        rectChooseMold.gameObject.SetActive(true);
     }
-    void OnDisable()
-    {
 
+
+    //Ingredient
+    public void ActiveIgredient()
+    {
+        rectIngredient.gameObject.SetActive(true);
+    }
+
+    public void DeactiveIgredient()
+    {
+        rectIngredient.gameObject.SetActive(false);
     }
 }

@@ -1,9 +1,10 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class UIHold : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
+public class UIHoldRadialReveal : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     private UIRadialReveal uIRadialReveal;
+
     void Awake()
     {
         uIRadialReveal = transform.GetChild(0).GetComponent<UIRadialReveal>();

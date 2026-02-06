@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 public class CakeMoldPrefab : GameUnit
 {
+    public Transform posIngredient;
     [SerializeField] RectTransform rectPouringBottomLayer, rectPouringTopLayer;
     private RectTransform rect;
     void Awake()
@@ -39,7 +40,7 @@ public class CakeMoldPrefab : GameUnit
     {
         if (rectPouringTopLayer != null) rectPouringTopLayer.GetComponent<Image>().enabled = false;
     }
-    // khi đây nắp lại thì deactive bọnnày đi
+    // khi đây nắp lại thì deactive bọn này đi và reset lại như cũ
     public void DeactivePouringLayer()
     {
         if (rectPouringBottomLayer != null)
@@ -52,5 +53,9 @@ public class CakeMoldPrefab : GameUnit
             rectPouringTopLayer.GetComponent<Image>().enabled = true;
             rectPouringTopLayer.gameObject.SetActive(false);
         }
+    }
+    void OnDisable()
+    {
+        DeactivePouringLayer();
     }
 }

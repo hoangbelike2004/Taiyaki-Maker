@@ -11,10 +11,15 @@ public enum CakeMoldType
 public enum IngredientPhaseType//Nguyen lieu lam nhan banh
 {
     None,
+    Red_Bean,
+    Cream,
+    Pizza,
 }
 public enum AdditionTimingType//Nguyen lieu trang tri
 {
     None,
+    Com_tym,
+    Tym,
 }
 public class CakeMoldBase
 {

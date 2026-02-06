@@ -7,6 +7,8 @@ public class IngredientBase
     public bool isAds = false;
 
     public float price;
+
+    public PoolType typePrefab;
 }
 [System.Serializable]
 public class AdditionTiming : IngredientBase//Trang tri

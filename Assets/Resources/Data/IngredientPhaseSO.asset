@@ -12,4 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f8dc6919a35c4d6e88352ef0b5ca126, type: 3}
   m_Name: IngredientPhaseSO
   m_EditorClassIdentifier: Assembly-CSharp::IngredientPhaseSO
-  ingredientPhases: []
+  ingredientPhases:
+  - icon: {fileID: 21300000, guid: d2df67f55a4fdfc40a318880098b8c5e, type: 3}
+    isAds: 0
+    price: 0
+    typePrefab: 10
+    phaseType: 1
+  - icon: {fileID: 21300000, guid: e507fd4842a9a51408785df1b9b75419, type: 3}
+    isAds: 0
+    price: 0
+    typePrefab: 10
+    phaseType: 2
+  - icon: {fileID: 21300000, guid: b232d903ebfa1fd429afbaa4c1e70627, type: 3}
+    isAds: 0
+    price: 0
+    typePrefab: 10
+    phaseType: 3

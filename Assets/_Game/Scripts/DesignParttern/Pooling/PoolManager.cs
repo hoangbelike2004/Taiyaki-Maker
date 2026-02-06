@@ -65,4 +65,8 @@ public enum PoolType
     Cake_Mold_Prefab_Fish,
     Cake_Mold_Prefab_Round,
     Cake_Mold_Prefab_Slipper,
+    Item_Ingredient_Phase,
+    Item_Addition_Timing,
+
+    Ingredient_Red_Bean_Prefab,
 }

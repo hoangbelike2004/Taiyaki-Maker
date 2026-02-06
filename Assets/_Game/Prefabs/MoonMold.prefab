@@ -189,7 +189,7 @@ MonoBehaviour:
   moldWeight: 0.85
   distanceWeight: 0.15
   noiseAmount: 0
-  noiseScale: 0.05
+  noiseScale: 0
   targetImage: {fileID: 0}
 --- !u!1 &5675600579379217198
 GameObject:
@@ -538,7 +538,7 @@ MonoBehaviour:
   moldWeight: 0.85
   distanceWeight: 0.15
   noiseAmount: 0
-  noiseScale: 0.05
+  noiseScale: 0
   targetImage: {fileID: 0}
 --- !u!1 &7676231214741442673
 GameObject:

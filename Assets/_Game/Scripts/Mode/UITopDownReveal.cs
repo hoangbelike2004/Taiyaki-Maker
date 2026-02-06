@@ -11,7 +11,7 @@ public class UITopDownReveal : MonoBehaviour
 
     [Header("Thông tin Tiến độ")]
     [Range(0f, 1f)]
-    public float CurrentProgress = 0f; // Biến này sẽ chạy từ 0 đến 1
+    public float CurrentProgress = 0f;
 
     [Header("Cài đặt Hiệu ứng")]
     [Range(0.01f, 0.5f)]
@@ -37,19 +37,60 @@ public class UITopDownReveal : MonoBehaviour
     private const float START_Y = 1.2f;
     private const float END_Y = -0.2f;
 
+    private Coroutine coroutine;
+
     void Start()
     {
         SetupTexture();
     }
 
-    void Update()
+    // --- PHẦN ĐÃ SỬA LẠI: TỰ ĐỘNG RESET KHI TẮT ---
+    void OnDisable()
     {
-        // Ấn Space để test
-        if (Input.GetKeyDown(KeyCode.Space) && !isRevealing)
+        // 1. Dừng chính xác coroutine đang chạy (nếu có)
+        if (coroutine != null)
         {
-            isRevealing = true;
-            StartCoroutine(RevealProcess());
+            StopCoroutine(coroutine);
+            coroutine = null;
         }
+
+        isRevealing = false;
+        CurrentProgress = 0f;
+
+        // 2. Kiểm tra an toàn trước khi reset ảnh
+        if (paintTex != null && currentPixels != null && originalPixels != null)
+        {
+            // Reset toàn bộ pixel về trạng thái gốc nhưng trong suốt (Alpha = 0)
+            for (int i = 0; i < currentPixels.Length; i++)
+            {
+                currentPixels[i] = originalPixels[i];
+                currentPixels[i].a = 0;
+            }
+
+            // Apply lại vào ảnh để nó biến mất ngay lập tức
+            paintTex.SetPixels32(currentPixels);
+            paintTex.Apply();
+        }
+    }
+    // ---------------------------------------------
+
+    public void StartRevealProcess()
+    {
+        // Nếu đang chạy cái cũ thì dừng lại trước khi chạy cái mới
+        if (coroutine != null) StopCoroutine(coroutine);
+
+        isRevealing = true; // Đánh dấu là đang chạy
+        coroutine = StartCoroutine(RevealProcess());
+    }
+
+    public void EndRevealProcess()
+    {
+        if (coroutine != null)
+        {
+            StopCoroutine(coroutine);
+            coroutine = null;
+        }
+        isRevealing = false;
     }
 
     void SetupTexture()
@@ -108,7 +149,6 @@ public class UITopDownReveal : MonoBehaviour
         {
             currentY -= revealSpeed * Time.deltaTime;
 
-            // Tính toán tiến độ (0 -> 1)
             CurrentProgress = Mathf.InverseLerp(START_Y, END_Y, currentY);
 
             ApplyScanline(currentY);
@@ -119,7 +159,6 @@ public class UITopDownReveal : MonoBehaviour
             yield return null;
         }
 
-        // Kết thúc: Đảm bảo 100% và hiện rõ nét
         CurrentProgress = 1.0f;
 
         System.Array.Copy(originalPixels, currentPixels, originalPixels.Length);
@@ -127,6 +166,10 @@ public class UITopDownReveal : MonoBehaviour
         paintTex.Apply();
 
         isRevealing = false;
+        coroutine = null; // Đánh dấu là đã xong
+
+        // --- DEBUG WIN TẠI ĐÂY ---
+        Debug.Log("Win");
     }
 
     void ApplyScanline(float scanLineLevel)

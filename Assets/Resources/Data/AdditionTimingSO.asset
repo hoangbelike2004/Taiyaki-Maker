@@ -12,4 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2caa71c0572e44c5abeb6bed2f2c419d, type: 3}
   m_Name: AdditionTimingSO
   m_EditorClassIdentifier: Assembly-CSharp::AdditionTimingSO
-  additionTimings: []
+  additionTimings:
+  - icon: {fileID: 0}
+    isAds: 0
+    price: 0
+    timingType: 1
+  - icon: {fileID: 0}
+    isAds: 0
+    price: 0
+    timingType: 2

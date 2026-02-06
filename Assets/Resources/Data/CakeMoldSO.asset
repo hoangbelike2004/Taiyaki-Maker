@@ -17,12 +17,12 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: cb1d2fc7b1f37d14889d9a58547b6b78, type: 3}
     prefabType: 5
     steps: 0200000003000000040000000500000007000000
-    ingredientTypes: 
+    ingredientTypes: 01000000
   - moldType: 2
     icon: {fileID: 21300000, guid: d62e8a96905a12f468b84239d78839d5, type: 3}
     prefabType: 4
     steps: 0200000003000000040000000500000007000000
-    ingredientTypes: 
+    ingredientTypes: 0100000002000000
   cakeMoldADSs:
   - moldType: 3
     icon: {fileID: 21300000, guid: ce762cc933585d049a5e968e7736fd76, type: 3}

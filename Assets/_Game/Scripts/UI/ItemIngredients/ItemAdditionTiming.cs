@@ -1,11 +1,11 @@
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-public class ItemIngredientPhase : GameUnit
+
+public class ItemAdditionTiming : GameUnit
 {
     [SerializeField] Image iconIngredient;
 
-    [SerializeField] TextMeshProUGUI txtPrice;
+    [SerializeField] Text txtPrice;
     protected Button btnClick;
 
     protected IngredientPhase ingredientPhase;
@@ -37,6 +37,6 @@ public class ItemIngredientPhase : GameUnit
 
     public virtual void OnClickItem()
     {
-        Observer.OnSellectIngredientPhase?.Invoke(ingredientPhase);
+
     }
 }

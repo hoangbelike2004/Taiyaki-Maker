@@ -6,4 +6,10 @@ public static class Observer
     public static UnityAction<CakeMoldBase> OnSellectedCakeMold;
 
     public static UnityAction OnChangeStage;
+
+    public static UnityAction OnEndStateChooseMold;
+
+    public static UnityAction OnDeactiveAddingFilling;
+
+    public static UnityAction<IngredientPhase> OnSellectIngredientPhase;
 }
