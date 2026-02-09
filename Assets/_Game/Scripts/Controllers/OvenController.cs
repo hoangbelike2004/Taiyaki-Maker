@@ -13,16 +13,19 @@ public enum CakeProcessStage
     Decorating,         // Trang trí
     Completed           // Hoàn thành
 }
-public class OvenController : MonoBehaviour
+public class OvenController : Singleton<OvenController>
 {
     [SerializeField] private Transform tfParentCakeMold, tfParentAdditionTimming, tfParentIngredient;
 
-    [SerializeField] RectTransform rectMold, rectIngredient;//rect cua cai lo
+    [SerializeField] RectTransform rectMold;//rect cua cai lo
+
+    public CakeProcessStage Stage => currentState;
 
     private CakeMoldSO cakeMoldSO;
 
     private AdditionTimingSO additionTimingSO;
 
+    [Tooltip("Nhan banh")]
     private IngredientPhaseSO ingredientPhaseSO;
 
     private Dictionary<IngredientPhaseType, ItemIngredientPhase> dicItemgredients = new Dictionary<IngredientPhaseType, ItemIngredientPhase>();
@@ -31,15 +34,19 @@ public class OvenController : MonoBehaviour
 
     private IngredientPhasePrefab ingredientPhasePrefab;
 
+    [Tooltip("Trang tri banh")]
+
+    private AdditionTiming additionTiming;
+
+    private Dictionary<AdditionTimingType, ItemAdditionTiming> itemAdditionTimings = new Dictionary<AdditionTimingType, ItemAdditionTiming>();
+
+    [Tooltip("Khuon banh")]
+
     private CakeMoldBase cakeMoldBase;//save the sellected value CakeMold(Khuôn bánh)
 
     private CakeMoldPrefab cakeMoldPrefab;//Khuon
 
     private List<ItemCakeMold> itemCakeMolds = new List<ItemCakeMold>();//dung de quan ly cac Item khuon banh
-
-    private IngredientPhaseType ingredientPhaseType;//save the sellected value cake
-
-    private AdditionTimingType additionTimingType;//save the sellected value decorating(nếu có)
 
     private CakeProcessStage currentState;
 
@@ -76,21 +83,25 @@ public class OvenController : MonoBehaviour
                 cakeMoldPrefab.ActivePouringBottomLayer();
                 break;
             case CakeProcessStage.AddingFilling:
-                cakeMoldPrefab.DeactivePouringBottomLayer();
                 canvasBaking.ActiveIgredient();
                 InstanceIngredientPhase();
                 break;
             case CakeProcessStage.PouringTopLayer:
+                cakeMoldPrefab.ActivePouringTopLayer();
                 break;
             case CakeProcessStage.Baking:
                 break;
             case CakeProcessStage.Decorating:
+                canvasBaking.ActiveAdditionTiming();
+                InstancAdditionTiming();
                 break;
             case CakeProcessStage.Completed:
+                Complete();
                 break;
         }
 
     }
+    //khởi tạo các item khuôn bánh
     void InstanceCakeMold()
     {
         if (cakeMoldSO != null)
@@ -144,14 +155,18 @@ public class OvenController : MonoBehaviour
     {
         if (this.ingredientPhase != null)
         {
-            SimplePool.Despawn(ingredientPhasePrefab);
+            Destroy(ingredientPhasePrefab.gameObject);
+            //SimplePool.Despawn(ingredientPhasePrefab);
             this.ingredientPhase = null;
         }
         this.ingredientPhase = ingredientPhase;
-        ingredientPhasePrefab = SimplePool.Spawn<IngredientPhasePrefab>(ingredientPhase.typePrefab, Vector3.zero, Quaternion.identity);
+        // ingredientPhasePrefab = SimplePool.Spawn<IngredientPhasePrefab>(ingredientPhase.typePrefab, Vector3.zero, Quaternion.identity);
+        ingredientPhasePrefab = Instantiate(ingredientPhaseSO.GetIngredientPhasePrefab(ingredientPhase.phaseType, cakeMoldBase.moldType));
         ingredientPhasePrefab.SetParent(cakeMoldPrefab.posIngredient);
     }
 
+
+    //khởi tạo các item nhân bánh
     void InstanceIngredientPhase()
     {
         if (dicItemgredients.Count == 0)
@@ -180,14 +195,40 @@ public class OvenController : MonoBehaviour
         canvasBaking.DeactiveIgredient();
     }
 
+    void DespawnFlour()
+    {
+        cakeMoldPrefab.DeactivePouringLayer();
+        if (ingredientPhasePrefab != null) Destroy(ingredientPhasePrefab.gameObject);
+    }
+
+
+    //khởi tạo phần trang trí
     void InstancAdditionTiming()
     {
         CakeMoldADS cakeMoldADS = cakeMoldBase as CakeMoldADS;
         if (cakeMoldADS == null) return;
-        for (int i = 0; i < cakeMoldADS.additionTimingTypes.Count; i++)
+        if (itemAdditionTimings.Count == 0)
         {
-            //khoi tạo những phan trang tri banh
+            for (int i = 0; i < additionTimingSO.additionTimings.Count; i++)
+            {
+                ItemAdditionTiming item = SimplePool.Spawn<ItemAdditionTiming>(PoolType.Item_Addition_Timing, Vector3.zero, Quaternion.identity);
+                item.SetData(additionTimingSO.additionTimings[i], tfParentAdditionTimming);
+                itemAdditionTimings.Add(additionTimingSO.additionTimings[i].timingType, item);
+            }
         }
+        if (itemAdditionTimings.Count != 0)
+        {
+            for (int i = 0; i < cakeMoldADS.additionTimingTypes.Count; i++)
+            {
+                itemAdditionTimings[cakeMoldADS.additionTimingTypes[i]].gameObject.SetActive(true);
+            }
+        }
+    }
+
+    void SellectAdditionTiming(AdditionTiming additionTiming)
+    {
+        this.additionTiming = additionTiming;
+        canvasBaking.DeactiveOverlayBtnNextAddition();
     }
 
     void DeactiveAdditionTiming()
@@ -196,32 +237,46 @@ public class OvenController : MonoBehaviour
         if (cakeMoldADS == null) return;
         for (int i = 0; i < cakeMoldADS.additionTimingTypes.Count; i++)
         {
-            //khoi tạo những phan trang tri banh
+            itemAdditionTimings[cakeMoldADS.additionTimingTypes[i]].gameObject.SetActive(false);
         }
     }
 
     void Complete()
     {
-        cakeMoldBase = null;
+        SimplePool.Despawn(cakeMoldPrefab);
         cakeMoldPrefab = null;
         currentSteps = 0;
         currentState = CakeProcessStage.None;
+        canvasBaking.DeactiveGriller();
+    }
+
+    public void MukbangComplete()
+    {
+        cakeMoldBase = null;
+        additionTiming = null;
+        ingredientPhase = null;
     }
     void OnEnable()
     {
         Observer.OnSellectedCakeMold += SellectCakeMold;
         Observer.OnSellectIngredientPhase += SellectIngredientPhase;
-        Observer.OnDeactiveAddingFilling += DeactiveIngredientPhase;
+        Observer.OnSellectAdditionTiming += SellectAdditionTiming;
+        Observer.OnDeactiveItemAddingFilling += DeactiveIngredientPhase;
         Observer.OnChangeStage += ChangeState;
         Observer.OnEndStateChooseMold += DeactiveCakeMold;
+        Observer.OnDespawnCakeMoldPrefab += DespawnFlour;
+        Observer.OnEndStateAdditionTiming += DeactiveAdditionTiming;
     }
 
     void OnDisable()
     {
         Observer.OnSellectedCakeMold -= SellectCakeMold;
         Observer.OnSellectIngredientPhase -= SellectIngredientPhase;
-        Observer.OnDeactiveAddingFilling -= DeactiveIngredientPhase;
+        Observer.OnSellectAdditionTiming -= SellectAdditionTiming;
+        Observer.OnDeactiveItemAddingFilling -= DeactiveIngredientPhase;
         Observer.OnChangeStage -= ChangeState;
         Observer.OnEndStateChooseMold -= DeactiveCakeMold;
+        Observer.OnDespawnCakeMoldPrefab -= DespawnFlour;
+        Observer.OnEndStateAdditionTiming -= DeactiveAdditionTiming;
     }
 }

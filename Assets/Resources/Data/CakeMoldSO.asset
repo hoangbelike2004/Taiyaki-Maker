@@ -27,12 +27,12 @@ MonoBehaviour:
   - moldType: 3
     icon: {fileID: 21300000, guid: ce762cc933585d049a5e968e7736fd76, type: 3}
     prefabType: 6
-    steps: 020000000300000004000000050000000600000007000000
-    ingredientTypes: 
-    additionTimingTypes: 
+    steps: 0200000005000000030000000600000007000000
+    ingredientTypes: 02000000
+    additionTimingTypes: 01000000
   - moldType: 4
     icon: {fileID: 21300000, guid: 9cba51ab13cf29e43a2b076e336083fa, type: 3}
     prefabType: 7
     steps: 020000000300000004000000050000000600000007000000
-    ingredientTypes: 
-    additionTimingTypes: 
+    ingredientTypes: 020000000100000003000000
+    additionTimingTypes: 02000000

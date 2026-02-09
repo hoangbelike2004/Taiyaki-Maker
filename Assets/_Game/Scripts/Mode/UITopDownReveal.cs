@@ -169,7 +169,8 @@ public class UITopDownReveal : MonoBehaviour
         coroutine = null; // Đánh dấu là đã xong
 
         // --- DEBUG WIN TẠI ĐÂY ---
-        Debug.Log("Win");
+        Observer.OnChangeStage?.Invoke();
+        Observer.OnEndStateAddingFilling?.Invoke();
     }
 
     void ApplyScanline(float scanLineLevel)

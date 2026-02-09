@@ -54,8 +54,15 @@ public class CakeMoldPrefab : GameUnit
             rectPouringTopLayer.gameObject.SetActive(false);
         }
     }
+    void OnEnable()
+    {
+        Observer.OnEndPouringTopLayer += DeactivePouringTopLayer;
+        Observer.OnEndPouringBottomLayer += DeactivePouringBottomLayer;
+    }
     void OnDisable()
     {
+        Observer.OnEndPouringTopLayer -= DeactivePouringTopLayer;
+        Observer.OnEndPouringBottomLayer -= DeactivePouringBottomLayer;
         DeactivePouringLayer();
     }
 }

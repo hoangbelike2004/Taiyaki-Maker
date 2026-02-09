@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IngredientPhaseSO
   ingredientPhases:
   - icon: {fileID: 21300000, guid: d2df67f55a4fdfc40a318880098b8c5e, type: 3}
-    isAds: 0
+    isAds: 1
     price: 0
     typePrefab: 10
     phaseType: 1
@@ -28,3 +28,34 @@ MonoBehaviour:
     price: 0
     typePrefab: 10
     phaseType: 3
+  fillingParts:
+  - phaseType: 2
+    typeMold: 1
+    prefab: {fileID: 5176499464982794510, guid: d508dbfebaabc4eae989e943cb9eb260, type: 3}
+  - phaseType: 2
+    typeMold: 2
+    prefab: {fileID: 5176499464982794510, guid: 78766607f708c45f8968f9a1202fcbff, type: 3}
+  - phaseType: 2
+    typeMold: 3
+    prefab: {fileID: 5176499464982794510, guid: d37fd3328b7ff44b185dc7238e5ece8d, type: 3}
+  - phaseType: 2
+    typeMold: 4
+    prefab: {fileID: 5176499464982794510, guid: 2c8262793655c4a29ac0cc3a13f18df6, type: 3}
+  - phaseType: 1
+    typeMold: 1
+    prefab: {fileID: 5176499464982794510, guid: 73273eb6bc2934ef28c2c49582d87151, type: 3}
+  - phaseType: 1
+    typeMold: 2
+    prefab: {fileID: 5176499464982794510, guid: afe097f94d97c4995a0f61e4c951322e, type: 3}
+  - phaseType: 1
+    typeMold: 4
+    prefab: {fileID: 5176499464982794510, guid: 1c8380eb3956d4fa1bfdc487e619954f, type: 3}
+  - phaseType: 3
+    typeMold: 1
+    prefab: {fileID: 5176499464982794510, guid: 1c8380eb3956d4fa1bfdc487e619954f, type: 3}
+  - phaseType: 3
+    typeMold: 2
+    prefab: {fileID: 5176499464982794510, guid: 3939f4520e797407ab70e6ee864fb452, type: 3}
+  - phaseType: 3
+    typeMold: 4
+    prefab: {fileID: 5176499464982794510, guid: bf02be4f43d4c417a8264694cd206726, type: 3}

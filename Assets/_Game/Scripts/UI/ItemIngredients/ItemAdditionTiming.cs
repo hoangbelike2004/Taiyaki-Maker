@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -5,12 +6,12 @@ public class ItemAdditionTiming : GameUnit
 {
     [SerializeField] Image iconIngredient;
 
-    [SerializeField] Text txtPrice;
+    [SerializeField] TextMeshProUGUI txtPrice;
     protected Button btnClick;
 
-    protected IngredientPhase ingredientPhase;
+    protected AdditionTiming ingredientPhase;
 
-    public virtual void SetData(IngredientPhase ingredientPhase, Transform parent)
+    public virtual void SetData(AdditionTiming ingredientPhase, Transform parent)
     {
         this.ingredientPhase = ingredientPhase;
         iconIngredient.sprite = ingredientPhase.icon;
@@ -24,6 +25,7 @@ public class ItemAdditionTiming : GameUnit
         {
             txtPrice.gameObject.SetActive(false);
         }
+        gameObject.SetActive(false);
     }
 
     void Start()
@@ -37,6 +39,6 @@ public class ItemAdditionTiming : GameUnit
 
     public virtual void OnClickItem()
     {
-
+        Observer.OnSellectAdditionTiming?.Invoke(ingredientPhase);
     }
 }

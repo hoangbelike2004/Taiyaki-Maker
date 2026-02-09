@@ -205,7 +205,18 @@ public class UIRadialReveal : MonoBehaviour
         paintTex.Apply();
     }
 
-    void OnLevelComplete() { Observer.OnChangeStage?.Invoke(); }
+    void OnLevelComplete()
+    {
+        if (OvenController.Instance.Stage == CakeProcessStage.PouringBottomLayer)
+        {
+            Observer.OnEndPouringBottomLayer?.Invoke();
+        }
+        else if (OvenController.Instance.Stage == CakeProcessStage.PouringTopLayer)
+        {
+            Observer.OnEndPouringTopLayer?.Invoke();
+        }
+        Observer.OnChangeStage?.Invoke();
+    }
 
     void ApplyWaterLevel(float level)
     {

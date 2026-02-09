@@ -13,7 +13,7 @@ public class UIHoldTopDownReveal : MonoBehaviour, IPointerDownHandler, IPointerU
     {
         if (uITopDownReveal != null)
         {
-            Observer.OnDeactiveAddingFilling?.Invoke();
+            Observer.OnDeactiveItemAddingFilling?.Invoke();
             uITopDownReveal.StartRevealProcess();
         }
     }

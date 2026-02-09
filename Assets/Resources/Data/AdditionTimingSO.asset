@@ -13,11 +13,13 @@ MonoBehaviour:
   m_Name: AdditionTimingSO
   m_EditorClassIdentifier: Assembly-CSharp::AdditionTimingSO
   additionTimings:
-  - icon: {fileID: 0}
+  - icon: {fileID: 21300000, guid: 7337599d4bdaa2a439ec543605f32c8e, type: 3}
     isAds: 0
     price: 0
+    typePrefab: 0
     timingType: 1
-  - icon: {fileID: 0}
+  - icon: {fileID: 21300000, guid: fb2df19e3a9b8e54f8215082436065e2, type: 3}
     isAds: 0
     price: 0
+    typePrefab: 0
     timingType: 2
