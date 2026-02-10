@@ -1,18 +1,22 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-using System.Collections; // Bắt buộc để dùng Coroutine
+using System.Collections;
+using Spine.Unity; // Bắt buộc để dùng Coroutine
 
 public class UIDragHoverZone : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    [Header("Settings")]
-    [Tooltip("Thời gian lặp lại hành động (giây).")]
-    public float repeatInterval = 0.5f;
-
     [Tooltip("Tag của UI được phép tương tác (để trống nếu nhận tất cả)")]
     public string targetTag = "DraggableUI";
 
     private DragEffects dragEffects;
     private Coroutine currentCoroutine;
+
+    private SkeletonGraphic skeletonGraphic;
+    private bool isEat = false;
+    private void Awake()
+    {
+        skeletonGraphic = transform.parent.GetComponent<SkeletonGraphic>();
+    }
 
     // --- Khi chuột mang vật đi VÀO vùng này ---
     public void OnPointerEnter(PointerEventData eventData)
@@ -46,16 +50,23 @@ public class UIDragHoverZone : MonoBehaviour, IPointerEnterHandler, IPointerExit
     IEnumerator RepeatProcessRoutine(GameObject draggedObj)
     {
         dragEffects = draggedObj.GetComponent<DragEffects>();
+        skeletonGraphic.AnimationState.SetAnimation(0, GameConstants.ANIMATION_SKELETON_EAT_1_1, false);
+        yield return new WaitForSeconds(0.25f);
+
+        skeletonGraphic.AnimationState.SetAnimation(0, GameConstants.ANIMATION_SKELETON_EAT_1_2, false);
         if (dragEffects != null)
         {
             // Truyền vật đang kéo sang để bên kia tính toán vị trí Trái/Phải
             dragEffects.ProcessDropZone(gameObject);
         }
+        yield return new WaitForSeconds(skeletonGraphic.SkeletonData.FindAnimation(GameConstants.ANIMATION_SKELETON_EAT_1_2).Duration);
         while (true)
         {
             // 1. Đợi một khoảng thời gian trước khi xử lý
-            yield return new WaitForSeconds(repeatInterval);
+            skeletonGraphic.AnimationState.SetAnimation(0, GameConstants.ANIMATION_SKELETON_EAT_1_1, false);
+            yield return new WaitForSeconds(0.25f);
 
+            skeletonGraphic.AnimationState.SetAnimation(0, GameConstants.ANIMATION_SKELETON_EAT_1_2, false);
             // 2. Kiểm tra an toàn: nếu vật đang kéo bị hủy (đã bị xóa hết) hoặc null thì dừng
             if (draggedObj == null)
             {
@@ -68,6 +79,7 @@ public class UIDragHoverZone : MonoBehaviour, IPointerEnterHandler, IPointerExit
                 // Truyền vật đang kéo sang để bên kia tính toán vị trí Trái/Phải
                 dragEffects.ProcessDropZone(gameObject);
             }
+            yield return new WaitForSeconds(skeletonGraphic.SkeletonData.FindAnimation(GameConstants.ANIMATION_SKELETON_EAT_1_2).Duration);
         }
     }
 
@@ -78,6 +90,57 @@ public class UIDragHoverZone : MonoBehaviour, IPointerEnterHandler, IPointerExit
         {
             StopCoroutine(currentCoroutine);
             currentCoroutine = null;
+            StartCoroutine(CheckAnimationEat());
         }
+    }
+    IEnumerator CheckAnimationEat()
+    {
+        while (true)
+        {
+            if (IsAnimationPlaying(GameConstants.ANIMATION_SKELETON_EAT_1_2))
+            {
+                skeletonGraphic.AnimationState.SetAnimation(0, GameConstants.ANIMATION_SKELETON_IDLE_1, true);
+                yield break;
+            }
+            yield return null;
+        }
+    }
+    private void OnDraggableCake(bool isDrag)
+    {
+        if (skeletonGraphic == null || currentCoroutine != null) return;
+        if (isDrag)
+        {
+            skeletonGraphic.AnimationState.SetAnimation(0, GameConstants.ANIMATION_SKELETON_CRAVE_1, true);
+        }
+        else
+        {
+            skeletonGraphic.AnimationState.SetAnimation(0, GameConstants.ANIMATION_SKELETON_IDLE_1, true);
+        }
+    }
+    public bool IsAnimationPlaying(string nameAnimation)
+    {
+        var track = skeletonGraphic.AnimationState.GetCurrent(0);
+
+        if (track != null && track.Animation.Name == nameAnimation)
+        {
+            if (track.IsComplete)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    void OnEnable()
+    {
+        Observer.OnDraggableCake += OnDraggableCake;
+        StopAllCoroutines();
+        currentCoroutine = null;
+        dragEffects = null;
+        skeletonGraphic.AnimationState.SetAnimation(0, GameConstants.ANIMATION_SKELETON_IDLE_1, true);
+    }
+
+    void OnDisable()
+    {
+        Observer.OnDraggableCake -= OnDraggableCake;
     }
 }

@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67c5fdd2ff2744b99bda32885d36d2c0, type: 3}
+  m_Name: CakeFinishSO
+  m_EditorClassIdentifier: Assembly-CSharp::CakeFinishSO
+  cakeBases:
+  - moldType: 1
+    additionTimingType: 0
+    ingredientPhaseType: 1
+    iconCakeMold: {fileID: 2119489420, guid: c9a94e2f043158243a3bc1c7e5bee43e, type: 3}
+    iconCake: {fileID: 21300000, guid: f8957bb922a55aa429b6e535c172c4d6, type: 3}
+    iconCakeWhenAddition: {fileID: 0}
+    prefab: {fileID: 6308044061505250152, guid: 583d7a5acafdd438ea1b892a6164f308, type: 3}
+  - moldType: 2
+    additionTimingType: 0
+    ingredientPhaseType: 1
+    iconCakeMold: {fileID: -1125463502, guid: d081dccf00b9c5b4fbcc7907259f4392, type: 3}
+    iconCake: {fileID: -346215504, guid: f2a2edcaf1d32284a87194eff295cda6, type: 3}
+    iconCakeWhenAddition: {fileID: 0}
+    prefab: {fileID: 5425135873602010635, guid: 93b96c953284a43b1bb9354128849b27, type: 3}
+  - moldType: 2
+    additionTimingType: 0
+    ingredientPhaseType: 2
+    iconCakeMold: {fileID: 1463938334, guid: 816edca17912cb64280291910991ea7c, type: 3}
+    iconCake: {fileID: -676447706, guid: fbe509106cda7d04a874245b0626fc07, type: 3}
+    iconCakeWhenAddition: {fileID: 0}
+    prefab: {fileID: 5425135873602010635, guid: 3f434007a196a4f7081f93b43e9ce95c, type: 3}
+  - moldType: 3
+    additionTimingType: 1
+    ingredientPhaseType: 2
+    iconCakeMold: {fileID: 21300000, guid: 02f6cb2092cbb3d4589a6df42518fd82, type: 3}
+    iconCake: {fileID: 21300000, guid: f88f7f5ba78651541bc74839b4f9b0a7, type: 3}
+    iconCakeWhenAddition: {fileID: 0}
+    prefab: {fileID: 4478866714022378297, guid: 5f0e802f8872643608ba439a25f895d4, type: 3}
+  - moldType: 4
+    additionTimingType: 2
+    ingredientPhaseType: 1
+    iconCakeMold: {fileID: -2027609961, guid: bed9822555f1a16409278afea0332485, type: 3}
+    iconCake: {fileID: 21300000, guid: 6e53322725b44e64aa1c9e1f6d7ec4f3, type: 3}
+    iconCakeWhenAddition: {fileID: 0}
+    prefab: {fileID: 1738108203875031307, guid: a63a2c9bb13324b91b907390022c0e49, type: 3}

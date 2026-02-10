@@ -53,17 +53,20 @@ public class OvenController : Singleton<OvenController>
     private int currentSteps = 0;
 
     private CanvasBaking canvasBaking;
+
+    private CakeFinishSO cakeFinishSO;
+
+    private CakeBase cakeBase;
+
+    private List<UIDraggable> uIDraggables = new List<UIDraggable>();
     void Awake()
     {
         canvasBaking = GetComponent<CanvasBaking>();
         cakeMoldSO = Resources.Load<CakeMoldSO>(GameConstants.KEY_DATA_GAME_CAKE_MOLD);
         additionTimingSO = Resources.Load<AdditionTimingSO>(GameConstants.KEY_DATA_GAME_ADDITION_TIMING);
         ingredientPhaseSO = Resources.Load<IngredientPhaseSO>(GameConstants.KEY_DATA_GAME_INGREDIENT_PHASE);
+        cakeFinishSO = Resources.Load<CakeFinishSO>(GameConstants.KEY_DATA_GAME_CAKE_FINISH);
         //goi ham instance ra các khuôn
-    }
-    void Start()
-    {
-        ChangeState();
     }
     void ChangeState()
     {
@@ -155,7 +158,7 @@ public class OvenController : Singleton<OvenController>
     {
         if (this.ingredientPhase != null)
         {
-            Destroy(ingredientPhasePrefab.gameObject);
+            if (ingredientPhasePrefab != null) Destroy(ingredientPhasePrefab.gameObject);
             //SimplePool.Despawn(ingredientPhasePrefab);
             this.ingredientPhase = null;
         }
@@ -195,10 +198,29 @@ public class OvenController : Singleton<OvenController>
         canvasBaking.DeactiveIgredient();
     }
 
-    void DespawnFlour()
+    //dung de deactive khi chay animation Cover
+    void DespawnFlour(bool isleft)
     {
-        cakeMoldPrefab.DeactivePouringLayer();
-        if (ingredientPhasePrefab != null) Destroy(ingredientPhasePrefab.gameObject);
+        cakeMoldPrefab.DeactivePouringLayer(isleft);
+        cakeMoldPrefab.DeactiveModlCake(isleft);
+        if (ingredientPhasePrefab != null && isleft) Destroy(ingredientPhasePrefab.gameObject);
+    }
+
+
+    //dung de active khi chay animation Open
+    public void ActiveMold(bool isleft)
+    {
+        cakeMoldPrefab.ActiveMoldCake(isleft);
+        if (isleft)
+        {
+            AdditionTimingType additionTimingType = additionTiming == null ? AdditionTimingType.None : additionTiming.timingType;
+
+            IngredientPhaseType ingredientPhaseType = ingredientPhase == null ? IngredientPhaseType.None : ingredientPhase.phaseType;
+
+            cakeBase = cakeFinishSO.GetCakeBaseWhenNormal(cakeMoldBase.moldType, ingredientPhaseType);
+
+            cakeMoldPrefab.SetCakeFinished(cakeBase.iconCakeMold);
+        }
     }
 
 
@@ -243,11 +265,37 @@ public class OvenController : Singleton<OvenController>
 
     void Complete()
     {
-        SimplePool.Despawn(cakeMoldPrefab);
-        cakeMoldPrefab = null;
-        currentSteps = 0;
-        currentState = CakeProcessStage.None;
-        canvasBaking.DeactiveGriller();
+        if (additionTiming != null)
+        {
+            AdditionTimingType additionTimingType = additionTiming == null ? AdditionTimingType.None : additionTiming.timingType;
+
+            IngredientPhaseType ingredientPhaseType = ingredientPhase == null ? IngredientPhaseType.None : ingredientPhase.phaseType;
+
+            cakeBase = cakeFinishSO.GetCakeBaseWhenAdditionTiming(cakeMoldBase.moldType, additionTimingType, ingredientPhaseType);
+        }
+        canvasBaking.DeactiveGriller(cakeBase.iconCake);
+        UIDraggable uIDraggable = cakeBase.prefab;
+        for (int i = 0; i < 5; i++)
+        {
+            UIDraggable draggable = Instantiate(uIDraggable);
+            uIDraggables.Add(draggable);
+        }
+        canvasBaking.InitMukbang(uIDraggables);
+    }
+    void RemoveUIDraggableWhenMukbang(UIDraggable uIDraggable)
+    {
+        if (uIDraggables.Count == 0) return;
+        if (uIDraggables.Contains(uIDraggable))
+        {
+            uIDraggables.Remove(uIDraggable);
+            if (uIDraggables.Count == 0)
+            {
+                MukbangComplete();
+                canvasBaking.ChangeMukbang(false);
+                GameController.Instance.EndBaking();
+            }
+        }
+
     }
 
     public void MukbangComplete()
@@ -255,6 +303,10 @@ public class OvenController : Singleton<OvenController>
         cakeMoldBase = null;
         additionTiming = null;
         ingredientPhase = null;
+        SimplePool.Despawn(cakeMoldPrefab);
+        cakeMoldPrefab = null;
+        currentSteps = 0;
+        currentState = CakeProcessStage.None;
     }
     void OnEnable()
     {
@@ -266,6 +318,8 @@ public class OvenController : Singleton<OvenController>
         Observer.OnEndStateChooseMold += DeactiveCakeMold;
         Observer.OnDespawnCakeMoldPrefab += DespawnFlour;
         Observer.OnEndStateAdditionTiming += DeactiveAdditionTiming;
+        Observer.OnActiveCakeMoldPrefab += ActiveMold;
+        Observer.OnRemoveDraggable += RemoveUIDraggableWhenMukbang;
     }
 
     void OnDisable()
@@ -278,5 +332,7 @@ public class OvenController : Singleton<OvenController>
         Observer.OnEndStateChooseMold -= DeactiveCakeMold;
         Observer.OnDespawnCakeMoldPrefab -= DespawnFlour;
         Observer.OnEndStateAdditionTiming -= DeactiveAdditionTiming;
+        Observer.OnActiveCakeMoldPrefab -= ActiveMold;
+        Observer.OnRemoveDraggable -= RemoveUIDraggableWhenMukbang;
     }
 }

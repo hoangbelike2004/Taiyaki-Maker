@@ -47,12 +47,10 @@ public class DragEffects : MonoBehaviour
         // 2. So sánh để biết bên Trái hay Phải
         if (objectX < zoneX - centerThreshold)
         {
-            Debug.Log("Đối tượng nằm bên TRÁI vùng chết -> Xóa phần tử ĐẦU TIÊN");
             RemoveFirstItem();
         }
         else
         {
-            Debug.Log("Đối tượng nằm bên PHẢI vùng chết -> Xóa phần tử CUỐI CÙNG");
             RemoveLastItem();
         }
     }
@@ -70,10 +68,11 @@ public class DragEffects : MonoBehaviour
             // Xóa GameObject khỏi màn hình
             if (itemToRemove != null)
                 Destroy(itemToRemove.gameObject);
+            if (imageList.Count == 0) Observer.OnRemoveDraggable?.Invoke(this.GetComponent<UIDraggable>());
         }
         else
         {
-            gameObject.SetActive(false);
+            Destroy(gameObject);
         }
     }
 
@@ -91,10 +90,11 @@ public class DragEffects : MonoBehaviour
             // Xóa GameObject khỏi màn hình
             if (itemToRemove != null)
                 Destroy(itemToRemove.gameObject);
+            if (imageList.Count == 0) Observer.OnRemoveDraggable?.Invoke(this.GetComponent<UIDraggable>());
         }
         else
         {
-            gameObject.SetActive(false);
+            Destroy(gameObject);
         }
     }
 }

@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Cake
+  - DraggableUI
   layers:
   - Default
   - TransparentFX

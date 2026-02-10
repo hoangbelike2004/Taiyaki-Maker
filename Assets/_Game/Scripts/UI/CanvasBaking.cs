@@ -2,11 +2,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CanvasBaking : UIManager
+public class CanvasBaking : UICanvas
 {
-    [SerializeField] Button btnNextChoose, btnNextAddition;
+    [SerializeField] Button btnNextChoose, btnNextAddition, btnNextToMukbang;
     [SerializeField] RectTransform rectChooseMold, rectIngredient, recAdditionTiming, rectGriller, rectShowComplete, rectMukBang;
     [SerializeField] List<RectTransform> rectCakes = new List<RectTransform>();
+
+    [SerializeField] Image iconCakeOfShowComplete;
     private Transform tfOverlaybtnNextChoose, tfOverlaybtnNextAddition;
     private bool isNext = false;
     void Awake()
@@ -30,6 +32,11 @@ public class CanvasBaking : UIManager
             Observer.OnEndStateAdditionTiming?.Invoke();
             DeactiveAdditionTiming();
         });
+        btnNextToMukbang.onClick.AddListener(() =>
+        {
+            rectShowComplete.gameObject.SetActive(false);
+            ChangeMukbang(true);
+        });
     }
     public void DeactiveOverlayBtnNext()
     {
@@ -52,10 +59,10 @@ public class CanvasBaking : UIManager
         rectChooseMold.gameObject.SetActive(true);
     }
 
-    public void DeactiveGriller()
+    public void DeactiveGriller(Sprite sprite)
     {
         rectGriller.gameObject.SetActive(false);
-        ChangeShowComplete(true);
+        ChangeShowComplete(sprite);
     }
 
 
@@ -93,14 +100,24 @@ public class CanvasBaking : UIManager
     }
 
     //Show Complete
-    public void ChangeShowComplete(bool isActive)
+    public void ChangeShowComplete(Sprite sprite)
     {
-        rectShowComplete.gameObject.SetActive(isActive);
+        rectShowComplete.gameObject.SetActive(true);
+        iconCakeOfShowComplete.sprite = sprite;
     }
     //Show Mukbang
 
     public void ChangeMukbang(bool isActive)
     {
         rectMukBang.gameObject.SetActive(isActive);
+    }
+
+    public void InitMukbang(List<UIDraggable> uIDraggables)
+    {
+        for (int i = 0; i < uIDraggables.Count; i++)
+        {
+            uIDraggables[i].transform.SetParent(rectMukBang.transform);
+            uIDraggables[i].Setparent(rectCakes[i]);
+        }
     }
 }
