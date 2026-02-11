@@ -1,11 +1,11 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-using DG.Tweening; // Bắt buộc phải có
+using DG.Tweening; // Nhớ import thư viện này
 
 public class UIDraggable : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler, IPointerDownHandler, IPointerUpHandler
 {
     [Header("Settings")]
-    [Tooltip("Tỉ lệ thu nhỏ khi nhấn")]
+    [Tooltip("Tỉ lệ thu nhỏ khi nhấn (Ví dụ: 0.9, 0.9, 1)")]
     public Vector3 draggingScale = new Vector3(0.9f, 0.9f, 1f);
 
     [Tooltip("Thời gian animation (giây)")]
@@ -14,21 +14,22 @@ public class UIDraggable : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndD
     [Tooltip("Kiểu chuyển động khi quay về (VD: OutBack để nảy nhẹ)")]
     public Ease returnEase = Ease.OutBack;
 
-    [Tooltip("Khoảng cách lệch so với ngón tay ngay khi nhấn.")]
+    [Tooltip("Khoảng cách lệch so với ngón tay (để ngón tay không che mất vật).")]
     public Vector2 dragOffset = new Vector2(0f, 50f);
 
+    // Các biến nội bộ
     private RectTransform rectTransform;
     private Canvas canvas;
     private CanvasGroup canvasGroup;
     private Vector3 originalScale;
-    private Vector2 startPosition; // Lưu vị trí ban đầu để quay về
-
+    private Vector2 startPosition; // Lưu vị trí xuất phát
     private bool isDragging = false;
 
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
-        // Lưu scale mặc định ban đầu (thường là 1,1,1)
+
+        // Lưu scale gốc lúc đầu game
         originalScale = transform.localScale;
 
         canvasGroup = GetComponent<CanvasGroup>();
@@ -36,55 +37,62 @@ public class UIDraggable : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndD
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
     }
 
+    private void Start()
+    {
+        // Tìm Canvas cha để đảm bảo tính toán tọa độ đúng
+        if (canvas == null)
+            canvas = GetComponentInParent<Canvas>();
+    }
+
+    // Hàm setup khi sinh ra từ Pool hoặc khởi tạo lại
     public void Setparent(RectTransform parent)
     {
         canvas = GetComponentInParent<Canvas>();
         rectTransform.anchoredPosition = parent.anchoredPosition;
-        float rnd = Random.Range(0.8f, 1);
+
+        // Random kích thước một chút cho tự nhiên (như code cũ của bạn)
+        float rnd = Random.Range(0.8f, 1f);
         transform.localScale = Vector3.one * rnd;
+        originalScale = transform.localScale; // Cập nhật lại originalScale theo random mới
     }
 
-    // 1. NHẤN VÀO: Thu nhỏ mượt mà
+    // --- 1. KHI NHẤN CHUỘT XUỐNG ---
     public void OnPointerDown(PointerEventData eventData)
     {
         isDragging = false;
 
-        // Lưu vị trí xuất phát để tí nữa còn biết đường quay về
+        // Lưu vị trí hiện tại làm điểm xuất phát để quay về
         startPosition = rectTransform.anchoredPosition;
 
+        // Bắn sự kiện cho Observer (Skeleton animation...)
         Observer.OnDraggableCake?.Invoke(true);
 
-        // Hủy các tween cũ đang chạy dở (quan trọng để không bị giật)
+        // Hủy các tween cũ để tránh xung đột
         rectTransform.DOKill();
 
-        // Animation thu nhỏ (Scale)
+        // Hiệu ứng thu nhỏ
         rectTransform.DOScale(draggingScale, duration).SetEase(Ease.OutQuad);
 
+        // Cho phép Raycast xuyên qua để tìm thấy Slot bên dưới
         canvasGroup.blocksRaycasts = false;
 
-        // Áp dụng Offset (Vẫn giữ nguyên để ngón tay không che mất vật)
-        if (canvas != null)
-        {
-            rectTransform.anchoredPosition += dragOffset / canvas.scaleFactor;
-        }
+        // --- QUAN TRỌNG: Cập nhật vị trí ngay lập tức ---
+        UpdatePositionToMouse(eventData);
     }
 
-    // 2. BẮT ĐẦU KÉO
+    // --- 2. KHI BẮT ĐẦU KÉO ---
     public void OnBeginDrag(PointerEventData eventData)
     {
         isDragging = true;
     }
 
-    // 3. ĐANG KÉO (Giữ nguyên logic để bám sát ngón tay)
+    // --- 3. TRONG KHI KÉO ---
     public void OnDrag(PointerEventData eventData)
     {
-        if (canvas != null)
-        {
-            rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
-        }
+        UpdatePositionToMouse(eventData);
     }
 
-    // 4. THẢ TAY RA: Phóng to lại & Bay về chỗ cũ
+    // --- 4. KHI THẢ CHUỘT RA ---
     public void OnPointerUp(PointerEventData eventData)
     {
         canvasGroup.blocksRaycasts = true;
@@ -94,27 +102,46 @@ public class UIDraggable : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndD
         // Hủy tween cũ
         rectTransform.DOKill();
 
-        // A. Animation phục hồi kích thước (nảy nhẹ nhờ Ease.OutBack)
+        // A. Trả lại kích thước gốc (nảy nhẹ)
         rectTransform.DOScale(originalScale, duration).SetEase(Ease.OutBack);
 
-        // B. Animation bay về vị trí cũ (startPosition)
-        // Dùng DOAnchorPos để di chuyển mượt mà về chỗ ban đầu
+        // B. Bay về vị trí cũ (startPosition)
         rectTransform.DOAnchorPos(startPosition, 0.3f).SetEase(returnEase);
     }
 
-    // 5. KẾT THÚC KÉO
     public void OnEndDrag(PointerEventData eventData)
     {
-        // Logic đã xử lý ở OnPointerUp
         isDragging = false;
     }
 
-    // Hàm bổ trợ: Nếu bạn thả trúng đích và KHÔNG muốn nó bay về chỗ cũ
-    // Hãy gọi hàm này từ script nhận (DropZone)
+    // --- HÀM TÍNH TOÁN VỊ TRÍ CHUẨN ---
+    // Giúp tâm vật thể luôn bám theo chuột bất kể bạn click vào rìa hay giữa
+    private void UpdatePositionToMouse(PointerEventData eventData)
+    {
+        if (canvas == null) return;
+
+        // Lấy RectTransform của cha (để tính tọa độ local so với cha)
+        RectTransform parentRect = rectTransform.parent as RectTransform;
+        Vector2 localPoint;
+
+        // Chuyển đổi vị trí màn hình (Screen) sang vị trí Local của cha (UI)
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            parentRect,
+            eventData.position,
+            eventData.pressEventCamera, // Camera UI (null nếu là Overlay)
+            out localPoint))
+        {
+            // Gán vị trí mới = Vị trí chuột (local) + Offset cài đặt
+            rectTransform.anchoredPosition = localPoint + dragOffset;
+        }
+    }
+
+    // --- HÀM GỌI KHI THẢ TRÚNG ĐÍCH ---
+    // Gọi hàm này từ script DropZone để ngăn vật bay về chỗ cũ
     public void OnDropSuccess()
     {
-        rectTransform.DOKill(); // Dừng việc bay về
-        rectTransform.localScale = originalScale; // Trả lại scale
-        // Tại đây bạn có thể snap nó vào vị trí mới nếu muốn
+        rectTransform.DOKill(); // Dừng bay về
+        rectTransform.localScale = originalScale; // Reset scale
+        // Bạn có thể thêm code snap vào tâm Slot ở đây nếu muốn
     }
 }

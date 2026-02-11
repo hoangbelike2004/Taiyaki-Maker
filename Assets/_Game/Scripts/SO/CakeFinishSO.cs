@@ -8,7 +8,8 @@ public class CakeFinishSO : ScriptableObject
     //lay loai banh khi chua trang tri
     public CakeBase GetCakeBaseWhenNormal(CakeMoldType cakeMoldType, IngredientPhaseType ingredientPhaseType)
     {
-        return cakeBases.Find(x => x.moldType == cakeMoldType && x.ingredientPhaseType == ingredientPhaseType);
+        if (ingredientPhaseType != IngredientPhaseType.None) return cakeBases.Find(x => x.moldType == cakeMoldType && x.ingredientPhaseType == ingredientPhaseType);
+        else return cakeBases.Find(x => x.moldType == cakeMoldType);
     }
 
     //lay banh khi da trang tri

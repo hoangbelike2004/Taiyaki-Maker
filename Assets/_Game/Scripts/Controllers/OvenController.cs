@@ -219,7 +219,7 @@ public class OvenController : Singleton<OvenController>
 
             cakeBase = cakeFinishSO.GetCakeBaseWhenNormal(cakeMoldBase.moldType, ingredientPhaseType);
 
-            cakeMoldPrefab.SetCakeFinished(cakeBase.iconCakeMold);
+            if (cakeBase != null) cakeMoldPrefab.SetCakeFinished(cakeBase.iconCakeMold);
         }
     }
 
@@ -273,6 +273,7 @@ public class OvenController : Singleton<OvenController>
 
             cakeBase = cakeFinishSO.GetCakeBaseWhenAdditionTiming(cakeMoldBase.moldType, additionTimingType, ingredientPhaseType);
         }
+        Debug.Log(cakeBase);
         canvasBaking.DeactiveGriller(cakeBase.iconCake);
         UIDraggable uIDraggable = cakeBase.prefab;
         for (int i = 0; i < 5; i++)
