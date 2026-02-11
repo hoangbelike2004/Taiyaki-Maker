@@ -13,6 +13,7 @@ public class ItemCakeMold : GameUnit
         this.cakeMoldBase = cakeMoldBase;
         iconMold.sprite = cakeMoldBase.icon;
         transform.SetParent(parent);
+        transform.localScale = Vector3.one;
     }
 
     void Start()

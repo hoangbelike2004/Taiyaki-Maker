@@ -24,6 +24,8 @@ public class ItemIngredientPhase : GameUnit
         {
             txtPrice.gameObject.SetActive(false);
         }
+
+        transform.localScale = Vector3.one;
     }
 
     void Start()

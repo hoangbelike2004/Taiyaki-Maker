@@ -6,11 +6,16 @@ public static class GameConstants
 
     public const string KEY_DATA_GAME_ADDITION_TIMING = "Data/AdditionTimingSO";
 
+    public const string KEY_DATA_GAME_COMMENT = "Data/ComentSO";
+
+
     public const string KEY_DATA_GAME_INGREDIENT_PHASE = "Data/IngredientPhaseSO";
 
     public const string KEY_DATA_GAME_CAKE_FINISH = "Data/CakeFinishSO";
 
     public const string KEY_DATA_GAME_CAKE_MOLD = "Data/CakeMoldSO";
+
+    public const string KEY_DATA_GAME_PLAYER = "Data/PlayerSO";
 
     public const string KEY_ANIMATION = "Index";
 

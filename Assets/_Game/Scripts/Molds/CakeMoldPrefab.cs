@@ -22,7 +22,7 @@ public class CakeMoldPrefab : GameUnit
     }
     public void SetParent(Transform parent)
     {
-        transform.SetParent(parent);
+        transform.SetParent(parent, false);
         transform.localScale = Vector3.one;
         rect.anchoredPosition = Vector3.zero;
     }

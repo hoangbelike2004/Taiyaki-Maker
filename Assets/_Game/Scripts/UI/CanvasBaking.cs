@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class CanvasBaking : UICanvas
 {
     [SerializeField] Button btnNextChoose, btnNextAddition, btnNextToMukbang;
-    [SerializeField] RectTransform rectChooseMold, rectIngredient, recAdditionTiming, rectGriller, rectShowComplete, rectMukBang;
+    [SerializeField] RectTransform rectChooseMold, rectIngredient, recAdditionTiming, rectGriller, rectShowComplete, rectMukBang, rectPosPlayer;
     [SerializeField] List<RectTransform> rectCakes = new List<RectTransform>();
 
     [SerializeField] Image iconCakeOfShowComplete;

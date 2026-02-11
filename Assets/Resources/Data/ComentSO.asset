@@ -12,4 +12,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30e8df91b531e415887b6edfc05a7a5a, type: 3}
   m_Name: ComentSO
   m_EditorClassIdentifier: Assembly-CSharp::ComentSO
-  commentCards: []
+  commentCards:
+  - type: 1
+    icon: {fileID: -1281979322, guid: 50363046c1055f6438a68e1f32e60001, type: 3}
+    cmts:
+    - abc
+    - abcd
+    - abcxyz
+  - type: 2
+    icon: {fileID: -190901311, guid: 50363046c1055f6438a68e1f32e60001, type: 3}
+    cmts:
+    - aaaaaaaaaaaaaaaaaaaaaaa
+    - bbbbbbbbbbbbbbbbbbbbb
+    - cccccccccccc
+  - type: 3
+    icon: {fileID: 1039920645, guid: 50363046c1055f6438a68e1f32e60001, type: 3}
+    cmts:
+    - hhhhhhhhhhhhhhhhhhhhh
+    - fffffffffffffffffffffffffff
+    - gggggggggggggggggg
+  - type: 4
+    icon: {fileID: -1760831052, guid: 50363046c1055f6438a68e1f32e60001, type: 3}
+    cmts:
+    - jjjjjjjjkkkkkkllllllll
+    - oooo
+    - 1234567890
+  - type: 5
+    icon: {fileID: 1967682876, guid: 50363046c1055f6438a68e1f32e60001, type: 3}
+    cmts:
+    - 123456789000000
+    - 1111112222233333
+    - :)_:)_:)_:)_:)_:)_:)_:)_:)

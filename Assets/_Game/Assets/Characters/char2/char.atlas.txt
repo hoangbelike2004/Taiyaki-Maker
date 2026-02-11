@@ -1,0 +1,172 @@
+
+char.png
+size: 2009,1821
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+body1
+  rotate: true
+  xy: 1126, 2
+  size: 982, 788
+  orig: 982, 788
+  offset: 0, 0
+  index: -1
+body2
+  rotate: false
+  xy: 2, 1237
+  size: 594, 414
+  orig: 598, 417
+  offset: 2, 2
+  index: -1
+chan1
+  rotate: true
+  xy: 598, 1162
+  size: 456, 676
+  orig: 458, 678
+  offset: 1, 1
+  index: -1
+chan2
+  rotate: true
+  xy: 1276, 986
+  size: 522, 693
+  orig: 526, 695
+  offset: 2, 1
+  index: -1
+eye1
+  rotate: false
+  xy: 752, 1631
+  size: 442, 145
+  orig: 444, 147
+  offset: 1, 1
+  index: -1
+eye2
+  rotate: false
+  xy: 1595, 1747
+  size: 412, 72
+  orig: 414, 76
+  offset: 1, 2
+  index: -1
+eye3
+  rotate: false
+  xy: 200, 1785
+  size: 450, 34
+  orig: 452, 36
+  offset: 1, 1
+  index: -1
+eye4
+  rotate: false
+  xy: 148, 1682
+  size: 430, 101
+  orig: 432, 103
+  offset: 1, 1
+  index: -1
+face1
+  rotate: false
+  xy: 2, 403
+  size: 1122, 757
+  orig: 1124, 760
+  offset: 1, 2
+  index: -1
+may1
+  rotate: false
+  xy: 1126, 1778
+  size: 467, 41
+  orig: 470, 45
+  offset: 1, 2
+  index: -1
+may2
+  rotate: false
+  xy: 652, 1782
+  size: 472, 37
+  orig: 474, 41
+  offset: 1, 2
+  index: -1
+mouth1
+  rotate: false
+  xy: 104, 1796
+  size: 94, 23
+  orig: 98, 27
+  offset: 2, 2
+  index: -1
+mouth2
+  rotate: false
+  xy: 2, 1800
+  size: 100, 19
+  orig: 104, 23
+  offset: 2, 2
+  index: -1
+mouth3
+  rotate: true
+  xy: 1196, 1620
+  size: 156, 176
+  orig: 158, 179
+  offset: 1, 1
+  index: -1
+mouth4
+  rotate: false
+  xy: 580, 1653
+  size: 170, 127
+  orig: 174, 129
+  offset: 2, 1
+  index: -1
+mouth5
+  rotate: false
+  xy: 2, 1700
+  size: 144, 94
+  orig: 146, 98
+  offset: 1, 2
+  index: -1
+phung1
+  rotate: true
+  xy: 1617, 1510
+  size: 235, 241
+  orig: 237, 243
+  offset: 1, 1
+  index: -1
+phung2
+  rotate: true
+  xy: 1374, 1510
+  size: 235, 241
+  orig: 237, 243
+  offset: 1, 1
+  index: -1
+
+char2.png
+size: 1432,2044
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+face2
+  rotate: false
+  xy: 2, 2
+  size: 1122, 757
+  orig: 1124, 760
+  offset: 1, 2
+  index: -1
+hair2
+  rotate: false
+  xy: 2, 761
+  size: 1428, 1281
+  orig: 1430, 1284
+  offset: 1, 2
+  index: -1
+
+char3.png
+size: 1802,1126
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+face3
+  rotate: true
+  xy: 1038, 2
+  size: 1122, 762
+  orig: 1124, 764
+  offset: 1, 1
+  index: -1
+hair1
+  rotate: false
+  xy: 2, 69
+  size: 1034, 1055
+  orig: 1038, 1058
+  offset: 2, 1
+  index: -1

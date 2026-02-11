@@ -26,13 +26,16 @@ public class UIHoldRadialReveal : MonoBehaviour, IPointerDownHandler, IPointerUp
 
     void OnEnable()
     {
+        Observer.OnEndPouringTopLayer += StopParticel;
+        Observer.OnEndPouringBottomLayer += StopParticel;
         if (uIRadialReveal != null)
             uIRadialReveal.gameObject.SetActive(true);
-        particleSystem.Stop();
     }
 
     void OnDisable()
     {
+        Observer.OnEndPouringTopLayer -= StopParticel;
+        Observer.OnEndPouringBottomLayer -= StopParticel;
         // Khi tắt đi thì trả về góc cũ ngay lập tức để tránh lỗi hiển thị lần sau
         transform.rotation = originalRotation;
 
@@ -73,5 +76,10 @@ public class UIHoldRadialReveal : MonoBehaviour, IPointerDownHandler, IPointerUp
             uIRadialReveal.EndPouring();
             particleSystem.Stop();
         }
+    }
+
+    public void StopParticel()
+    {
+        particleSystem.Stop();
     }
 }

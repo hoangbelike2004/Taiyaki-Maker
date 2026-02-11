@@ -25,6 +25,7 @@ public class ItemAdditionTiming : GameUnit
         {
             txtPrice.gameObject.SetActive(false);
         }
+        transform.localScale = Vector3.one;
         gameObject.SetActive(false);
     }
 

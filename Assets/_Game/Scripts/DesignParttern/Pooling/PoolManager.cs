@@ -69,4 +69,6 @@ public enum PoolType
     Item_Addition_Timing,
 
     Ingredient_Red_Bean_Prefab,
+
+    Item_Cmt,
 }
